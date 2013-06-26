@@ -1,0 +1,55 @@
+class TestRunnerBase
+
+instance variables
+  protected testName : seq of char := "";
+
+operations
+  public TestRunnerBase : seq of char ==> TestRunnerBase
+  TestRunnerBase(aTestName) == testName := aTestName;
+  
+  public run : () ==> ()
+  run() == (
+    dcl ts : TestSuite := new TestSuite(testName),
+        tr : TestResult := new TestResult();
+    
+    -- リスナー登録
+    tr.addListener(new PrintTestListener());
+    
+    -- テストケース追加
+    addTest(ts);
+    
+    -- テスト実行
+    ts.run(tr);
+    
+    -- テスト結果のXML書き出し
+    writeResult(ts, tr);
+    
+    -- 最終結果表示
+    if tr.wasSuccessful() then
+      print("*** All tests Passed. ***")
+    else
+      print("*** ERROR! ***")
+  );
+  
+  protected addTest : TestSuite ==> ()
+  addTest(ts) == is subclass responsibility;
+  
+  protected print : seq of char ==> ()
+  print(aS) == def - = new IO().echo(aS ^ "\n") in skip;
+  
+  protected writeResult : TestSuite * TestResult ==> ()
+  writeResult(ts, tr) ==
+    def
+      testResult = mk_JUnitXMLCreator`testResults(
+                    testName,
+                    ts.countTestCases(),
+                    tr.errorCount(),
+                    tr.failureCount(),
+                    tr.wasSuccessful(),
+                    ts.tests(),
+                    tr.failures()
+                   );
+    in
+      new JUnitXMLCreator().writeResult(testResult);
+
+end TestRunnerBase

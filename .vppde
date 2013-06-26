@@ -1,0 +1,13 @@
+encode UTF-8
+set exception
+r io.vpp
+r XMLCreator.vpp
+r JUnitXMLCreator.vpp
+r TestRunner.vpp
+r TestRunnerBase.vpp
+r VDMUnit.vpp
+r VDMUtil.vpp
+r Calc.vpp
+tc * pos
+init
+print new TestRunner().run()

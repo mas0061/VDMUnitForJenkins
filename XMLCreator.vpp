@@ -1,0 +1,23 @@
+class XMLCreator
+
+instance variables
+  protected io : IO := new IO();
+  protected iFileName : seq of char := "no_name.xml";
+
+operations
+  protected createFile : () ==> ()
+  createFile() ==
+    def - = io.fecho(iFileName, "<?xml version='1.0' encoding='UTF-8'?>\n", <start>) in skip
+  pre
+    len iFileName > 0;
+  
+  public writeLine : seq of char ==> ()
+  writeLine(lineString) ==
+    def - = io.fecho(iFileName, lineString ^ "\n", <append>) in skip;
+  
+  public writeLines : seq of seq of char ==> ()
+  writeLines(lineStrings) ==
+    for str in lineStrings do
+      def - = io.fecho(iFileName, str ^ "\n", <append>) in skip;
+  
+end XMLCreator

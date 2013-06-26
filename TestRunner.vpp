@@ -1,0 +1,18 @@
+-- ToDo
+--  いまはfailureだけ取り扱ってて、errorを取り扱っていない
+
+class TestRunner is subclass of TestRunnerBase
+
+operations
+  public TestRunner : () ==> TestRunner
+  TestRunner() == testName := "VDMUnit for Jenkins";
+  
+  protected addTest : TestSuite ==> ()
+  addTest(ts) == (
+    ts.addTest(new CalcTest("add test"));
+    ts.addTest(new CalcTest2("add test2"));
+  );
+  
+end TestRunner
+
+

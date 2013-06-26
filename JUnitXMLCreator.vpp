@@ -1,0 +1,73 @@
+class JUnitXMLCreator is subclass of XMLCreator
+
+instance variables
+  timestamp : seq of char := VDMUtil`val2seq_of_char[nat](VDMUtil`current_time());
+
+types
+  public testResults :: testName : seq of char
+                        testCount : int
+                        errorCount : int
+                        failureCount : int
+                        result : bool
+                        tests : seq of Test
+                        failures : seq of TestFailure
+    inv tr ==
+      len tr.tests >= len tr.failures
+      and tr.testCount >= tr.errorCount + tr.failureCount
+      and tr.result => (tr.errorCount = 0 and tr.failureCount = 0 and len tr.failures = 0)
+      and (not tr.result) => (tr.errorCount > 0 or tr.failureCount > 0 or len tr.failures > 0);
+
+operations
+  public writeResult : testResults ==> ()
+  writeResult(results) ==
+    def
+      testCount = " tests='" ^ convertString(results.testCount) ^ "' ";
+      errorCount = " errors='" ^ convertString(results.errorCount) ^ "' ";
+      failureCount = " failures='" ^ convertString(results.failureCount) ^ "' ";
+      result = convertResult(results.result);
+      failures = results.failures;
+    in (
+      dcl lines : seq of seq of char := [];
+      iFileName := "build/TEST-" ^ results.testName ^ "-" ^ timestamp ^ ".xml";
+      createFile();
+      
+      lines := lines
+        ^ ["<testsuite" ^ errorCount ^ failureCount ^ "name='" ^ results.testName ^ "'" ^
+                testCount ^ "timestamp='" ^ timestamp ^ "'>",
+           "  <properties />"];
+      
+      for test in results.tests do (
+        lines := lines ^ ["  <testcase classname='" ^ VDMUtil`classname[Test](test) ^
+                  "' name='" ^ test.getName() ^ "'>"];
+        if isFailure(test, failures) then
+          lines := lines ^ ["    <failure message='" ^ getFailure(test, failures).toString() ^ "' />"];
+        lines := lines ^ ["  </testcase>"];
+      );
+      
+      lines := lines ^ 
+        ["  <system-out><![CDATA[{'result' : '" ^ result ^ "'}]]></system-out>",
+         "  <system-err />",
+         "</testsuite>"];
+         
+      writeLines(lines);
+    );
+  
+functions
+  static convertString : real -> seq of char
+  convertString(number) == VDMUtil`val2seq_of_char[real](number);
+  
+  static convertResult : bool -> seq of char
+  convertResult(result) == if result then "'success'" else "'failure'";
+  
+  static isFailure : Test * seq of TestFailure -> bool
+  isFailure(test, failures) ==
+    len [ t | t in set inds failures & failures(t).fieldTest() = test ] > 0;
+
+  static getFailure : Test * seq of TestFailure -> TestFailure
+  getFailure(test, failures) ==
+    let
+      [failure] = [ failures(f) | f in set inds failures & failures(f).fieldTest() = test]
+    in
+      failure;
+
+end JUnitXMLCreator

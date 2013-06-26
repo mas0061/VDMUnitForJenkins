@@ -1,0 +1,72 @@
+class Calc
+
+instance variables
+  static ia : int := 0;
+  inv
+    ia < 10;
+
+operations
+  public static add : int * int ==> int
+  add(a, b) == (
+    ia := a;
+    return a + b;
+  );
+
+end Calc
+
+
+class CalcTest is subclass of TestCase
+
+instance variables
+  iCalc : Calc;
+
+operations
+  public CalcTest : seq of char ==> CalcTest
+  CalcTest(aName) == setName(aName);
+  
+  public setUp : () ==> ()
+  setUp() == (
+    iCalc := new Calc();
+  );
+
+  public runTest : () ==> ()
+  runTest() == (
+    def
+      addResult = iCalc.add(1, 2)
+    in
+      assertTrue("Result is wrong 1.", addResult = 3);
+  );
+
+values
+  JCGControl_imports = { "junit.framework.TestCase" };
+
+end CalcTest
+
+
+class CalcTest2 is subclass of TestCase
+
+instance variables
+  iCalc : Calc;
+
+operations
+  public CalcTest2 : seq of char ==> CalcTest2
+  CalcTest2(aName) == setName(aName);
+  
+  public setUp : () ==> ()
+  setUp() == (
+    iCalc := new Calc();
+  );
+
+  public runTest : () ==> ()
+  runTest() == (
+    def
+      addResult = iCalc.add(2, 2)
+    in
+      assertFalse("Result is wrong 2.", addResult = 3);
+--      assertFalse("Result is wrong 2.", addResult = 4);
+  );
+
+values
+  JCGControl_imports = { "junit.framework.TestCase" };
+
+end CalcTest2
