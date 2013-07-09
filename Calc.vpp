@@ -62,8 +62,8 @@ operations
     def
       addResult = iCalc.add(2, 2)
     in
---      assertFalse("Result is wrong 2.", addResult = 3);
-      assertFalse("Result is wrong 2.", addResult = 4);
+      assertFalse("Result is wrong 2.", addResult = 3);
+--      assertFalse("Result is wrong 2.", addResult = 4);
   );
 
 values
